@@ -1,0 +1,25 @@
+{
+  "name": "wholesale-aggregator",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "frontend",
+    "services/*",
+    "ai-service"
+  ],
+  "scripts": {
+    "dev": "docker compose -f infra/docker-compose.yml up -d && npm run dev:services",
+    "dev:services": "concurrently \"npm run dev -w services/gateway\" \"npm run dev -w services/auth-service\"",
+    "lint": "eslint . --ext .ts,.tsx,.js",
+    "test": "npm run test --workspaces --if-present",
+    "clean": "find . -name 'node_modules' -type d -prune -exec rm -rf '{}' +"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "eslint": "^8.57.0"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  }
+}

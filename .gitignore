@@ -1,0 +1,80 @@
+# Dependencies
+node_modules/
+__pycache__/
+*.pyc
+.venv/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Build outputs
+dist/
+build/
+*.egg-info/
+
+# Logs
+*.log
+logs/
+
+# Docker
+.dockerignore
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/settings.json
+.idea/
+
+# ML artifacts
+ai-service/models/*.pkl
+ai-service/models/*.joblib
+mlruns/
+
+# Database
+*.sql.bak
+pgdata/
+mongodata/
+node_modules/
+__pycache__/
+*.pyc
+.venv/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Build outputs
+dist/
+build/
+*.egg-info/
+
+# Logs
+*.log
+logs/
+
+# Docker
+.dockerignore
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/settings.json
+.idea/
+
+# ML artifacts
+ai-service/models/*.pkl
+ai-service/models/*.joblib
+mlruns/
+
+# Database
+*.sql.bak
+pgdata/
+mongodata/
+EOF
