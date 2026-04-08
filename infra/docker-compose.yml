@@ -1,0 +1,142 @@
+version: "3.9"
+
+networks:
+  wholesale_net:
+    driver: bridge
+
+volumes:
+  pgdata:
+  mongodata:
+  redisdata:
+  miniodata:
+
+services:
+
+  # ── PostgreSQL
+  postgres:
+    image: postgres:16-alpine
+    container_name: wholesale_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB:       ${POSTGRES_DB:-wholesale_db}
+      POSTGRES_USER:     ${POSTGRES_USER:-wholesale_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme_dev}
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./postgres/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-wholesale_user}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    networks:
+      - wholesale_net
+
+  # ── MongoDB
+  mongodb:
+    image: mongo:7.0
+    container_name: wholesale_mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_DATABASE: wholesale_catalog
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodata:/data/db
+      - ./mongo/init.js:/docker-entrypoint-initdb.d/init.js:ro
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    networks:
+      - wholesale_net
+
+  # ── Redis
+  redis:
+    image: redis:7.2-alpine
+    container_name: wholesale_redis
+    restart: unless-stopped
+    command: >
+      redis-server
+      --requirepass ${REDIS_PASSWORD:-redispass_dev}
+      --maxmemory 256mb
+      --maxmemory-policy allkeys-lru
+      --appendonly yes
+    ports:
+      - "6379:6379"
+    volumes:
+      - redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD:-redispass_dev}", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - wholesale_net
+
+  # ── MinIO
+  minio:
+    image: minio/minio:latest
+    container_name: wholesale_minio
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER:     ${S3_ACCESS_KEY:-minioadmin}
+      MINIO_ROOT_PASSWORD: ${S3_SECRET_KEY:-minioadmin123}
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - miniodata:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - wholesale_net
+
+  # ── pgAdmin (dev tool)
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: wholesale_pgadmin
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL:    admin@wholesale.dev
+      PGADMIN_DEFAULT_PASSWORD: pgadmin_dev
+      PGADMIN_CONFIG_SERVER_MODE: "False"
+    ports:
+      - "5050:80"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - wholesale_net
+    profiles:
+      - devtools
+
+  # ── Mongo Express (dev tool)
+  mongo-express:
+    image: mongo-express:latest
+    container_name: wholesale_mongoexpress
+    restart: unless-stopped
+    environment:
+      ME_CONFIG_MONGODB_SERVER:        mongodb
+      ME_CONFIG_MONGODB_PORT:          27017
+      ME_CONFIG_BASICAUTH_USERNAME:    admin
+      ME_CONFIG_BASICAUTH_PASSWORD:    mexpress_dev
+    ports:
+      - "8081:8081"
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    networks:
+      - wholesale_net
+    profiles:
+      - devtools
