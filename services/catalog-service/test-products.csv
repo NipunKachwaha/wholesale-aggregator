@@ -1,0 +1,11 @@
+sku,product_name,price,category,unit,stock_qty
+RICE-001,Basmati Rice Premium,120.50,Grains,KG,500
+RICE-002,Brown Rice Organic,95.00,Grains,KG,300
+OIL-001,Sunflower Oil Refined,180.00,Oils,LTR,200
+OIL-002,Mustard Oil Pure,220.00,Oils,LTR,150
+FLOUR-001,Wheat Flour Whole,45.00,Flour,KG,1000
+SUGAR-001,White Sugar Fine,42.00,Sugar,KG,800
+SALT-001,Iodized Table Salt,20.00,Spices,KG,600
+DAL-001,Yellow Moong Dal,110.00,Pulses,KG,400
+DAL-002,Red Masoor Dal,95.00,Pulses,KG,350
+TEA-001,Assam CTC Tea,350.00,Beverages,KG,200
