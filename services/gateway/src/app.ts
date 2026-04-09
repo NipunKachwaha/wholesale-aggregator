@@ -6,19 +6,17 @@ import logger from "./middleware/logger";
 import { apiLimiter } from "./middleware/rateLimiter";
 import { errorHandler, notFoundHandler } from "./middleware/errorHandler";
 import healthRouter from "./routes/health";
+import protectedRouter from "./routes/protected";
 
 const app: Application = express();
 
-// ── Security Headers
+// ── Security
 app.use(helmet());
 
-// ── CORS Setup
+// ── CORS
 app.use(
   cors({
-    origin: [
-      "http://localhost:5173", // React dev server
-      "http://localhost:3000",
-    ],
+    origin: ["http://localhost:5173", "http://localhost:3000"],
     credentials: true,
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
@@ -29,29 +27,29 @@ app.use(
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true }));
 
-// ── Request Logger
+// ── Logger
 app.use(logger);
 
-// ── Rate Limiter (sabhi /api routes par)
+// ── Rate Limiter
 app.use("/api", apiLimiter);
 
 // ── Routes
 app.use("/health", healthRouter);
+app.use("/api/v1/test", protectedRouter);
 
-// ── Placeholder routes (Step 4+ mein real routes aayenge)
+// ── API Info
 app.get("/api/v1", (req, res) => {
   res.json({
     success: true,
     message: "Wholesale Aggregator API v1",
     version: "1.0.0",
-    docs: "/api/v1/docs",
   });
 });
 
-// ── 404 Handler
+// ── 404
 app.use(notFoundHandler);
 
-// ── Global Error Handler
+// ── Error Handler
 app.use(errorHandler);
 
 export default app;
