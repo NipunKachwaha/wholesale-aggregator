@@ -1,29 +1,27 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { Provider, useSelector } from "react-redux";
-import { store, RootState } from "./store";
+import { store } from "./store";
+import type { RootState } from "./store";
 import Layout from "./components/layout/Layout";
 import Dashboard from "./pages/Dashboard";
 import Products from "./pages/Products";
 import Orders from "./pages/Orders";
 import Vendors from "./pages/Vendors";
 
-// Protected Route — login nahi hai toh /login pe bhejo
+// Protected Route
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isLoggedIn } = useSelector((state: RootState) => state.auth);
   return isLoggedIn ? <>{children}</> : <Navigate to="/login" replace />;
 }
 
-// Temporary Login Page (Step 10 mein real banegi)
+// Temp Login Page
 function TempLogin() {
   const { isLoggedIn } = useSelector((state: RootState) => state.auth);
 
   if (isLoggedIn) return <Navigate to="/" replace />;
 
   return (
-    <div
-      className="min-h-screen bg-slate-800 flex items-center
-                    justify-center"
-    >
+    <div className="min-h-screen bg-slate-800 flex items-center justify-center">
       <div className="bg-white rounded-2xl p-8 w-full max-w-md shadow-2xl">
         <div className="text-center mb-8">
           <span className="text-5xl">🏪</span>
@@ -34,8 +32,6 @@ function TempLogin() {
             Step 10 mein real login banega
           </p>
         </div>
-
-        {/* Temp bypass button */}
         <button
           onClick={() => {
             store.dispatch({
@@ -58,8 +54,7 @@ function TempLogin() {
               },
             });
           }}
-          className="w-full py-3 bg-blue-600 text-white rounded-lg
-                     font-medium hover:bg-blue-700 transition-colors"
+          className="w-full py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors"
         >
           Demo Login (Admin) →
         </button>

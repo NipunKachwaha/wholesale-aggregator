@@ -1,5 +1,22 @@
-import { configureStore, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { User, AuthTokens } from "../types";
+import { configureStore, createSlice } from "@reduxjs/toolkit";
+import type { PayloadAction } from "@reduxjs/toolkit";
+
+// ── Types
+interface User {
+  id: string;
+  tenantId: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  role: "admin" | "purchaser" | "viewer" | "supplier";
+  isActive: boolean;
+}
+
+interface AuthTokens {
+  accessToken: string;
+  refreshToken: string;
+  expiresIn: string;
+}
 
 // ── Auth Slice
 interface AuthState {
@@ -10,17 +27,15 @@ interface AuthState {
   loading: boolean;
 }
 
-const initialAuthState: AuthState = {
-  user: null,
-  accessToken: localStorage.getItem("accessToken"),
-  refreshToken: localStorage.getItem("refreshToken"),
-  isLoggedIn: !!localStorage.getItem("accessToken"),
-  loading: false,
-};
-
 const authSlice = createSlice({
   name: "auth",
-  initialState: initialAuthState,
+  initialState: {
+    user: null,
+    accessToken: localStorage.getItem("accessToken"),
+    refreshToken: localStorage.getItem("refreshToken"),
+    isLoggedIn: !!localStorage.getItem("accessToken"),
+    loading: false,
+  } as AuthState,
   reducers: {
     setCredentials: (
       state,
@@ -94,15 +109,15 @@ export const store = configureStore({
   },
 });
 
-// ── Exports
-export const { setCredentials, logout, setLoading } = authSlice.actions;
+// ── Types — ZAROORI EXPORTS
+export type RootState = ReturnType<typeof store.getState>;
+export type AppDispatch = typeof store.dispatch;
 
+// ── Action Exports
+export const { setCredentials, logout, setLoading } = authSlice.actions;
 export const {
   toggleSidebar,
   setCurrentPage,
   addNotification,
   removeNotification,
 } = uiSlice.actions;
-
-export type RootState = ReturnType<typeof store.getState>;
-export type AppDispatch = typeof store.dispatch;
