@@ -8,6 +8,7 @@ import Dashboard from "./pages/Dashboard";
 import Products from "./pages/Products";
 import Orders from "./pages/Orders";
 import Vendors from "./pages/Vendors";
+import Analytics from './pages/Analytics'
 
 // Protected Route
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -31,6 +32,7 @@ function AppRoutes() {
         <Route path="products" element={<Products />} />
         <Route path="orders" element={<Orders />} />
         <Route path="vendors" element={<Vendors />} />
+        <Route path="analytics" element={<Analytics />} />
       </Route>
     </Routes>
   );
