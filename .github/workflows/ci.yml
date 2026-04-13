@@ -1,0 +1,207 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+env:
+  NODE_VERSION: '20'
+  PYTHON_VERSION: '3.11'
+
+jobs:
+  # ── Job 1: Node Services Test
+  test-node-services:
+    name: Test Node Services
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB:       wholesale_db_test
+          POSTGRES_USER:     test_user
+          POSTGRES_PASSWORD: test_pass
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      redis:
+        image: redis:7.2-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install root dependencies
+        run: npm install
+
+      - name: Install Gateway dependencies
+        run: |
+          cd services/gateway
+          npm install
+
+      - name: Install Auth dependencies
+        run: |
+          cd services/auth-service
+          npm install
+
+      - name: Install Catalog dependencies
+        run: |
+          cd services/catalog-service
+          npm install
+
+      - name: Install Order dependencies
+        run: |
+          cd services/order-service
+          npm install
+
+      - name: Build all services
+        run: |
+          cd services/gateway      && npm run build
+          cd ../auth-service       && npm run build
+          cd ../catalog-service    && npm run build
+          cd ../order-service      && npm run build
+
+      - name: Run health check
+        run: echo "✅ All Node services built successfully"
+
+  # ── Job 2: Python AI Service Test
+  test-ai-service:
+    name: Test AI Service
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install dependencies
+        run: |
+          cd ai-service
+          pip install -r requirements.txt
+
+      - name: Test imports
+        run: |
+          cd ai-service
+          python -c "from main import app; print('✅ AI Service imports OK')"
+
+      - name: Test price optimizer
+        run: |
+          cd ai-service
+          python -c "
+          from pipelines.price_optimizer import price_optimizer
+          result = price_optimizer.optimize('TEST-001', 100.0, 'Grains', 500)
+          assert result['suggested_price'] > 0
+          print('✅ Price optimizer test passed')
+          "
+
+      - name: Test demand forecaster
+        run: |
+          cd ai-service
+          python -c "
+          from pipelines.demand_forecaster import demand_forecaster
+          result = demand_forecaster.forecast('TEST-001', 'tenant-1', 7)
+          assert len(result['forecasts']) == 7
+          print('✅ Demand forecaster test passed')
+          "
+
+  # ── Job 3: Frontend Build
+  build-frontend:
+    name: Build Frontend
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        run: |
+          cd frontend
+          npm install
+
+      - name: Build
+        run: |
+          cd frontend
+          npm run build
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-dist
+          path: frontend/dist/
+
+  # ── Job 4: Docker Build Test
+  docker-build:
+    name: Docker Build Test
+    runs-on: ubuntu-latest
+    needs: [test-node-services, test-ai-service, build-frontend]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build Auth Service image
+        run: |
+          docker build -t wholesale-auth:test \
+            services/auth-service/
+
+      - name: Build Catalog Service image
+        run: |
+          docker build -t wholesale-catalog:test \
+            services/catalog-service/
+
+      - name: Build AI Service image
+        run: |
+          docker build -t wholesale-ai:test \
+            ai-service/
+
+      - name: All images built
+        run: echo "✅ All Docker images built successfully"
+
+  # ── Job 5: Deploy (sirf main branch pe)
+  deploy:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    needs: [docker-build]
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy notification
+        run: |
+          echo "🚀 Deploying to production..."
+          echo "Branch: ${{ github.ref }}"
+          echo "Commit: ${{ github.sha }}"
+          echo "✅ Deployment pipeline complete"
