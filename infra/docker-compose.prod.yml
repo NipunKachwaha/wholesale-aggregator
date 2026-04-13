@@ -1,0 +1,220 @@
+version: "3.9"
+
+networks:
+  wholesale_net:
+    driver: bridge
+
+volumes:
+  pgdata:
+  mongodata:
+  redisdata:
+  miniodata:
+
+services:
+
+  # ── PostgreSQL
+  postgres:
+    image: postgres:16-alpine
+    container_name: wholesale_postgres
+    restart: always
+    environment:
+      POSTGRES_DB:       ${POSTGRES_DB}
+      POSTGRES_USER:     ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./postgres/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      interval: 10s
+      timeout:  5s
+      retries:  5
+    networks:
+      - wholesale_net
+
+  # ── MongoDB
+  mongodb:
+    image: mongo:7.0
+    container_name: wholesale_mongo
+    restart: always
+    environment:
+      MONGO_INITDB_DATABASE: wholesale_catalog
+    volumes:
+      - mongodata:/data/db
+      - ./mongo/init.js:/docker-entrypoint-initdb.d/init.js:ro
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout:  5s
+      retries:  5
+    networks:
+      - wholesale_net
+
+  # ── Redis
+  redis:
+    image: redis:7.2-alpine
+    container_name: wholesale_redis
+    restart: always
+    command: redis-server --requirepass ${REDIS_PASSWORD} --maxmemory 256mb
+    volumes:
+      - redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping"]
+      interval: 10s
+      timeout:  5s
+      retries:  5
+    networks:
+      - wholesale_net
+
+  # ── MinIO
+  minio:
+    image: minio/minio:latest
+    container_name: wholesale_minio
+    restart: always
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER:     ${S3_ACCESS_KEY}
+      MINIO_ROOT_PASSWORD: ${S3_SECRET_KEY}
+    volumes:
+      - miniodata:/data
+    networks:
+      - wholesale_net
+
+  # ── API Gateway
+  gateway:
+    build:
+      context:    ../services/gateway
+      dockerfile: Dockerfile
+    container_name: wholesale_gateway
+    restart: always
+    environment:
+      NODE_ENV:           production
+      APP_PORT:           3000
+      JWT_SECRET:         ${JWT_SECRET}
+      POSTGRES_HOST:      postgres
+      POSTGRES_PORT:      5432
+      POSTGRES_DB:        ${POSTGRES_DB}
+      POSTGRES_USER:      ${POSTGRES_USER}
+      POSTGRES_PASSWORD:  ${POSTGRES_PASSWORD}
+      REDIS_HOST:         redis
+      REDIS_PORT:         6379
+      REDIS_PASSWORD:     ${REDIS_PASSWORD}
+      AI_SERVICE_URL:     http://ai-service:8000
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - wholesale_net
+
+  # ── Auth Service
+  auth-service:
+    build:
+      context:    ../services/auth-service
+      dockerfile: Dockerfile
+    container_name: wholesale_auth
+    restart: always
+    environment:
+      NODE_ENV:           production
+      AUTH_SERVICE_PORT:  3001
+      JWT_SECRET:         ${JWT_SECRET}
+      JWT_EXPIRES_IN:     15m
+      POSTGRES_HOST:      postgres
+      POSTGRES_PORT:      5432
+      POSTGRES_DB:        ${POSTGRES_DB}
+      POSTGRES_USER:      ${POSTGRES_USER}
+      POSTGRES_PASSWORD:  ${POSTGRES_PASSWORD}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - wholesale_net
+
+  # ── Catalog Service
+  catalog-service:
+    build:
+      context:    ../services/catalog-service
+      dockerfile: Dockerfile
+    container_name: wholesale_catalog
+    restart: always
+    environment:
+      NODE_ENV:              production
+      CATALOG_SERVICE_PORT:  3002
+      POSTGRES_HOST:         postgres
+      POSTGRES_PORT:         5432
+      POSTGRES_DB:           ${POSTGRES_DB}
+      POSTGRES_USER:         ${POSTGRES_USER}
+      POSTGRES_PASSWORD:     ${POSTGRES_PASSWORD}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - wholesale_net
+
+  # ── Order Service
+  order-service:
+    build:
+      context:    ../services/order-service
+      dockerfile: Dockerfile
+    container_name: wholesale_orders
+    restart: always
+    environment:
+      NODE_ENV:            production
+      ORDER_SERVICE_PORT:  3003
+      POSTGRES_HOST:       postgres
+      POSTGRES_PORT:       5432
+      POSTGRES_DB:         ${POSTGRES_DB}
+      POSTGRES_USER:       ${POSTGRES_USER}
+      POSTGRES_PASSWORD:   ${POSTGRES_PASSWORD}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - wholesale_net
+
+  # ── AI Service
+  ai-service:
+    build:
+      context:    ../ai-service
+      dockerfile: Dockerfile
+    container_name: wholesale_ai
+    restart: always
+    environment:
+      APP_PORT:           8000
+      POSTGRES_HOST:      postgres
+      POSTGRES_PORT:      5432
+      POSTGRES_DB:        ${POSTGRES_DB}
+      POSTGRES_USER:      ${POSTGRES_USER}
+      POSTGRES_PASSWORD:  ${POSTGRES_PASSWORD}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - wholesale_net
+
+  # ── Frontend
+  frontend:
+    build:
+      context:    ../frontend
+      dockerfile: Dockerfile
+    container_name: wholesale_frontend
+    restart: always
+    networks:
+      - wholesale_net
+
+  # ── Nginx Reverse Proxy
+  nginx:
+    image: nginx:alpine
+    container_name: wholesale_nginx
+    restart: always
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.prod.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - gateway
+      - frontend
+      - ai-service
+    networks:
+      - wholesale_net
