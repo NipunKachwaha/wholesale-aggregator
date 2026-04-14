@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
+import NLQueryBar from '../components/NLQueryBar'
 
 const stats = [
   { label: "Total Orders", value: "248", icon: "🛒", color: "bg-blue-500" },
@@ -88,6 +89,11 @@ export default function Dashboard() {
       <p ref={titleRef} className="text-slate-500 mb-6">
         Welcome back! Yahan aapka overview hai.
       </p>
+
+      {/* NL Query Bar */}
+      <div>
+        <NLQueryBar />
+      </div>
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
