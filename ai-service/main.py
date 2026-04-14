@@ -5,7 +5,7 @@ import os
 
 load_dotenv()
 
-from routers import health, pricing, forecast
+from routers import health, pricing, forecast, nlquery
 from utils.db import test_connection
 
 # ── FastAPI app
@@ -33,6 +33,7 @@ app.add_middleware(
 app.include_router(health.router)
 app.include_router(pricing.router)
 app.include_router(forecast.router)
+app.include_router(nlquery.router)
 
 # ── Startup
 @app.on_event("startup")

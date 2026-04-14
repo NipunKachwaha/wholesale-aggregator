@@ -54,3 +54,19 @@ class AnomalyResponse(BaseModel):
     anomalies: List[AnomalyItem]
     total:     int
     checked:   int
+    
+# ── NL Query
+class NLQueryRequest(BaseModel):
+    query:     str
+    tenant_id: str
+    execute:   Optional[bool] = True
+
+class NLQueryResponse(BaseModel):
+    query:        str
+    intent:       str
+    explanation:  str
+    sql:          Optional[str]      = None
+    api_endpoint: Optional[str]      = None
+    results:      Optional[List[dict]] = None
+    total:        Optional[int]      = None
+    parameters:   Optional[dict]     = None
