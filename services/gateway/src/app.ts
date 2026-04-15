@@ -7,6 +7,7 @@ import { apiLimiter } from "./middleware/rateLimiter";
 import { errorHandler, notFoundHandler } from "./middleware/errorHandler";
 import healthRouter from "./routes/health";
 import protectedRouter from "./routes/protected";
+import eventsRouter from './routes/events'
 
 const app: Application = express();
 
@@ -45,6 +46,18 @@ app.get("/api/v1", (req, res) => {
     version: "1.0.0",
   });
 });
+
+// WS Stats
+app.get('/ws/stats', (req, res) => {
+  const { getConnectedCount } = require('./websocket/ws.server')
+  res.json({
+    success:    true,
+    connected:  getConnectedCount(),
+    timestamp:  new Date().toISOString(),
+  })
+})
+
+app.use('/internal/events', eventsRouter)
 
 // ── 404
 app.use(notFoundHandler);
