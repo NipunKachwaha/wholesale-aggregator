@@ -1,5 +1,6 @@
+import { useEffect } from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { Provider, useSelector } from "react-redux";
+import { Provider, useSelector, useDispatch } from "react-redux";
 import { store } from "./store";
 import type { RootState } from "./store";
 import Layout from "./components/layout/Layout";
@@ -14,6 +15,20 @@ import Analytics from './pages/Analytics'
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isLoggedIn } = useSelector((state: RootState) => state.auth);
   return isLoggedIn ? <>{children}</> : <Navigate to="/login" replace />;
+}
+
+function DarkModeProvider({ children }: { children: React.ReactNode }) {
+  const { darkMode } = useSelector((state: RootState) => state.ui)
+
+  useEffect(() => {
+    if (darkMode) {
+      document.documentElement.classList.add('dark')
+    } else {
+      document.documentElement.classList.remove('dark')
+    }
+  }, [darkMode])
+
+  return <>{children}</>
 }
 
 function AppRoutes() {
@@ -42,8 +57,10 @@ export default function App() {
   return (
     <Provider store={store}>
       <BrowserRouter>
-        <AppRoutes />
+        <DarkModeProvider>
+          <AppRoutes />
+        </DarkModeProvider>
       </BrowserRouter>
     </Provider>
-  );
+  )
 }

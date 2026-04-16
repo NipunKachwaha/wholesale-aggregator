@@ -1,0 +1,96 @@
+{
+  "nav": {
+    "dashboard":  "डैशबोर्ड",
+    "products":   "उत्पाद",
+    "orders":     "ऑर्डर",
+    "vendors":    "विक्रेता",
+    "analytics":  "विश्लेषण",
+    "logout":     "लॉग आउट"
+  },
+  "dashboard": {
+    "welcome":        "वापस स्वागत है!",
+    "subtitle":       "यहाँ आपका अवलोकन है",
+    "totalOrders":    "कुल ऑर्डर",
+    "activeProducts": "सक्रिय उत्पाद",
+    "vendors":        "विक्रेता",
+    "revenue":        "राजस्व",
+    "recentOrders":   "हाल के ऑर्डर",
+    "askAI":          "AI से कुछ भी पूछें..."
+  },
+  "products": {
+    "title":        "उत्पाद सूची",
+    "search":       "SKU या नाम से खोजें...",
+    "sync":         "विक्रेता फ़ीड सिंक करें",
+    "refresh":      "ताज़ा करें",
+    "available":    "उत्पाद उपलब्ध",
+    "noProducts":   "कोई उत्पाद नहीं मिला",
+    "syncFirst":    "उत्पाद जोड़ने के लिए फ़ीड सिंक करें"
+  },
+  "orders": {
+    "title":        "ऑर्डर",
+    "newOrder":     "नया ऑर्डर",
+    "refresh":      "ताज़ा करें",
+    "totalOrders":  "कुल ऑर्डर",
+    "noOrders":     "अभी कोई ऑर्डर नहीं",
+    "statusAll":    "सभी",
+    "consolidate":  "ऑर्डर समेकन",
+    "mergeSuggestion": "ऑर्डर मर्ज होंगे",
+    "saving":       "बचाए जाएंगे"
+  },
+  "vendors": {
+    "title":        "विक्रेता",
+    "addVendor":    "विक्रेता जोड़ें",
+    "registered":   "विक्रेता पंजीकृत",
+    "syncNow":      "अभी सिंक करें",
+    "syncing":      "सिंक हो रहा है...",
+    "noVendors":    "अभी कोई विक्रेता नहीं",
+    "addFirst":     "पहला विक्रेता जोड़ें"
+  },
+  "analytics": {
+    "title":          "विश्लेषण",
+    "subtitle":       "AI-संचालित अंतर्दृष्टि",
+    "ordersAnalyzed": "विश्लेषित ऑर्डर",
+    "priceSavings":   "औसत मूल्य बचत",
+    "accuracy":       "पूर्वानुमान सटीकता",
+    "aiService":      "AI सेवा",
+    "optimize":       "मूल्य अनुकूलित करें",
+    "forecast":       "पूर्वानुमान बनाएं",
+    "optimizing":     "विश्लेषण हो रहा है...",
+    "forecasting":    "पूर्वानुमान लगाया जा रहा है..."
+  },
+  "common": {
+    "loading":    "लोड हो रहा है...",
+    "error":      "कुछ गलत हो गया",
+    "retry":      "फिर कोशिश करें",
+    "save":       "सहेजें",
+    "cancel":     "रद्द करें",
+    "delete":     "हटाएं",
+    "edit":       "संपादित करें",
+    "add":        "जोड़ें",
+    "search":     "खोजें",
+    "filter":     "फ़िल्टर",
+    "export":     "निर्यात",
+    "import":     "आयात",
+    "yes":        "हाँ",
+    "no":         "नहीं",
+    "confirm":    "पुष्टि करें",
+    "back":       "वापस",
+    "next":       "अगला",
+    "submit":     "जमा करें",
+    "close":      "बंद करें",
+    "online":     "ऑनलाइन",
+    "offline":    "ऑफलाइन"
+  },
+  "auth": {
+    "login":          "लॉग इन",
+    "register":       "रजिस्टर",
+    "email":          "ईमेल",
+    "password":       "पासवर्ड",
+    "firstName":      "पहला नाम",
+    "lastName":       "अंतिम नाम",
+    "loginBtn":       "🔑 लॉग इन",
+    "registerBtn":    "✨ खाता बनाएं",
+    "loading":        "⏳ कृपया प्रतीक्षा करें...",
+    "demoCredentials": "डेमो: admin@demo.com / Admin@1234"
+  }
+}

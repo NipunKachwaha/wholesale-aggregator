@@ -1,36 +1,33 @@
 import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
+import { useTranslation } from 'react-i18next'
 import NLQueryBar from '../components/NLQueryBar'
 
-const stats = [
-  { label: "Total Orders", value: "248", icon: "🛒", color: "bg-blue-500" },
-  {
-    label: "Active Products",
-    value: "1,842",
-    icon: "📦",
-    color: "bg-green-500",
-  },
-  { label: "Vendors", value: "12", icon: "🏭", color: "bg-purple-500" },
-  { label: "Revenue", value: "₹4.2L", icon: "💰", color: "bg-orange-500" },
-];
-
-const recentOrders = [
-  { id: 1001, sku: "RICE-001", status: "confirmed", amount: "₹1,205" },
-  { id: 1002, sku: "OIL-001", status: "draft", amount: "₹900" },
-  { id: 1003, sku: "DAL-002", status: "fulfilled", amount: "₹475" },
-];
-
 const statusColors: Record<string, string> = {
-  draft: "bg-slate-100 text-slate-600",
-  confirmed: "bg-blue-100 text-blue-700",
-  fulfilled: "bg-green-100 text-green-700",
-  cancelled: "bg-red-100 text-red-600",
+  draft: "bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300",
+  confirmed: "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300",
+  fulfilled: "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300",
+  cancelled: "bg-red-100 text-red-600 dark:bg-red-900 dark:text-red-300",
 };
 
 export default function Dashboard() {
+  const { t } = useTranslation();
   const titleRef = useRef<HTMLParagraphElement>(null);
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
   const tableRef = useRef<HTMLDivElement>(null);
+
+  const stats = [
+    { label: t('dashboard.totalOrders'), value: "248", icon: "🛒", color: "bg-blue-500" },
+    { label: t('dashboard.activeProducts'), value: "1,842", icon: "📦", color: "bg-green-500" },
+    { label: t('dashboard.vendors'), value: "12", icon: "🏭", color: "bg-purple-500" },
+    { label: t('dashboard.revenue'), value: "₹4.2L", icon: "💰", color: "bg-orange-500" },
+  ];
+
+  const recentOrders = [
+    { id: 1001, sku: "RICE-001", status: "confirmed", amount: "₹1,205" },
+    { id: 1002, sku: "OIL-001", status: "draft", amount: "₹900" },
+    { id: 1003, sku: "DAL-002", status: "fulfilled", amount: "₹475" },
+  ];
 
   useEffect(() => {
     const tl = gsap.timeline();
@@ -86,8 +83,8 @@ export default function Dashboard() {
 
   return (
     <div>
-      <p ref={titleRef} className="text-slate-500 mb-6">
-        Welcome back! Yahan aapka overview hai.
+      <p ref={titleRef} className="text-slate-500 dark:text-slate-400 mb-6">
+        {t('dashboard.welcome')} {t('dashboard.subtitle')}
       </p>
 
       {/* NL Query Bar */}
@@ -96,7 +93,7 @@ export default function Dashboard() {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6 mb-6 md:mb-8">
         {stats.map((stat, i) => (
           <div
             key={stat.label}
@@ -105,7 +102,7 @@ export default function Dashboard() {
             }}
             onMouseEnter={() => handleCardEnter(cardRefs.current[i])}
             onMouseLeave={() => handleCardLeave(cardRefs.current[i])}
-            className="bg-white rounded-xl shadow-sm p-6 border border-slate-100 cursor-default"
+            className="bg-white dark:bg-slate-800 rounded-xl shadow-sm p-6 border border-slate-100 dark:border-slate-700 cursor-default"
           >
             <div className="flex items-center justify-between mb-4">
               <span
@@ -114,8 +111,8 @@ export default function Dashboard() {
                 {stat.icon}
               </span>
             </div>
-            <p className="text-2xl font-bold text-slate-800">{stat.value}</p>
-            <p className="text-slate-500 text-sm mt-1">{stat.label}</p>
+            <p className="text-2xl font-bold text-slate-800 dark:text-slate-100">{stat.value}</p>
+            <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">{stat.label}</p>
           </div>
         ))}
       </div>
@@ -123,33 +120,39 @@ export default function Dashboard() {
       {/* Recent Orders Table */}
       <div
         ref={tableRef}
-        className="bg-white rounded-xl shadow-sm border border-slate-100 p-6"
+        className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 p-6"
       >
-        <h2 className="text-lg font-semibold text-slate-800 mb-4">
-          Recent Orders
+        <h2 className="text-lg font-semibold text-slate-800 dark:text-slate-100 mb-4">
+          {t('dashboard.recentOrders')}
         </h2>
-        <div className="space-y-3">
-          {recentOrders.map((order) => (
-            <div
-              key={order.id}
-              className="flex items-center justify-between py-3 border-b border-slate-100 last:border-0 hover:bg-slate-50 px-2 rounded-lg transition-colors cursor-pointer"
-            >
-              <div>
-                <p className="font-medium text-slate-800">Order #{order.id}</p>
-                <p className="text-sm text-slate-500">SKU: {order.sku}</p>
+        <div className="overflow-x-auto -mx-2 px-2">
+          <div className="space-y-3">
+            {recentOrders.map((order) => (
+              <div
+                key={order.id}
+                className="flex items-center justify-between py-3 border-b border-slate-100 dark:border-slate-700 last:border-0 hover:bg-slate-50 dark:hover:bg-slate-700 px-2 rounded-lg transition-colors cursor-pointer"
+              >
+                <div>
+                  <p className="font-medium text-slate-800 dark:text-slate-100">
+                    {t('dashboard.orderHash')}{order.id}
+                  </p>
+                  <p className="text-sm text-slate-500 dark:text-slate-400">
+                    {t('dashboard.sku')}: {order.sku}
+                  </p>
+                </div>
+                <div className="flex items-center gap-4">
+                  <span className="font-medium text-slate-700 dark:text-slate-300">
+                    {order.amount}
+                  </span>
+                  <span
+                    className={`px-3 py-1 text-sm rounded-full ${statusColors[order.status]}`}
+                  >
+                    {t(`dashboard.status.${order.status}`)}
+                  </span>
+                </div>
               </div>
-              <div className="flex items-center gap-4">
-                <span className="font-medium text-slate-700">
-                  {order.amount}
-                </span>
-                <span
-                  className={`px-3 py-1 text-sm rounded-full ${statusColors[order.status]}`}
-                >
-                  {order.status}
-                </span>
-              </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </div>
     </div>

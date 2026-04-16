@@ -66,6 +66,7 @@ const authSlice = createSlice({
 interface UiState {
   sidebarOpen: boolean;
   currentPage: string;
+  darkMode: boolean; // ← ADD
   notifications: { id: string; message: string; type: string }[];
 }
 
@@ -74,11 +75,17 @@ const uiSlice = createSlice({
   initialState: {
     sidebarOpen: true,
     currentPage: "dashboard",
+    darkMode: localStorage.getItem("darkMode") === "true", // ← ADD
     notifications: [],
   } as UiState,
   reducers: {
     toggleSidebar: (state) => {
       state.sidebarOpen = !state.sidebarOpen;
+    },
+    toggleDarkMode: (state) => {
+      // ← ADD
+      state.darkMode = !state.darkMode;
+      localStorage.setItem("darkMode", String(state.darkMode));
     },
     setCurrentPage: (state, action: PayloadAction<string>) => {
       state.currentPage = action.payload;
@@ -120,4 +127,5 @@ export const {
   setCurrentPage,
   addNotification,
   removeNotification,
+  toggleDarkMode, // ← ADD
 } = uiSlice.actions;

@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import OrderTable from "../components/orders/OrderTable";
 import OrderStatusBadge from "../components/orders/OrderStatusBadge";
+import ConsolidationPanel from "../components/orders/ConsolidationPanel";
 import {
   getOrders,
   updateOrderStatus,
@@ -132,6 +133,11 @@ export default function Orders() {
           loading={loading}
           onUpdate={() => fetchOrders(status)}
         />
+      </div>
+
+      {/* Consolidation Panel */}
+      <div className="mt-6">
+        <ConsolidationPanel />
       </div>
     </div>
   );

@@ -39,6 +39,15 @@ router.post("/", createOrderValidation, async (req: Request, res: Response) => {
       return;
     }
 
+    // Email bhejo (background mein)
+    import('../services/email.service').then(({ sendEmail }) => {
+      sendEmail(
+        'admin@demo.com',
+        'orderCreated',
+        result.order
+      ).catch(err => console.error('Email send failed:', err));
+    });
+
     res.status(201).json({
       success: true,
       message: "Order create ho gaya",
@@ -120,6 +129,16 @@ router.patch(
         });
         return;
       }
+
+      // Email bhejo (background mein)
+      import('../services/email.service').then(({ sendEmail }) => {
+        sendEmail(
+          'admin@demo.com',
+          'orderStatusChanged',
+          result.order,
+          status
+        ).catch(err => console.error('Email send failed:', err));
+      });
 
       res.json({
         success: true,

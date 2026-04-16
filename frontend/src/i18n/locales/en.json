@@ -1,0 +1,96 @@
+{
+  "nav": {
+    "dashboard":  "Dashboard",
+    "products":   "Products",
+    "orders":     "Orders",
+    "vendors":    "Vendors",
+    "analytics":  "Analytics",
+    "logout":     "Logout"
+  },
+  "dashboard": {
+    "welcome":        "Welcome back!",
+    "subtitle":       "Here is your overview",
+    "totalOrders":    "Total Orders",
+    "activeProducts": "Active Products",
+    "vendors":        "Vendors",
+    "revenue":        "Revenue",
+    "recentOrders":   "Recent Orders",
+    "askAI":          "Ask AI anything..."
+  },
+  "products": {
+    "title":        "Product Catalog",
+    "search":       "Search by SKU or name...",
+    "sync":         "Sync Vendor Feed",
+    "refresh":      "Refresh",
+    "available":    "products available",
+    "noProducts":   "No products found",
+    "syncFirst":    "Sync a vendor feed to add products"
+  },
+  "orders": {
+    "title":        "Orders",
+    "newOrder":     "New Order",
+    "refresh":      "Refresh",
+    "totalOrders":  "total orders",
+    "noOrders":     "No orders yet",
+    "statusAll":    "All",
+    "consolidate":  "Order Consolidation",
+    "mergeSuggestion": "orders will be merged",
+    "saving":       "will be saved"
+  },
+  "vendors": {
+    "title":        "Vendors",
+    "addVendor":    "Add Vendor",
+    "registered":   "vendors registered",
+    "syncNow":      "Sync Now",
+    "syncing":      "Syncing...",
+    "noVendors":    "No vendors yet",
+    "addFirst":     "Add your first vendor"
+  },
+  "analytics": {
+    "title":          "Analytics",
+    "subtitle":       "AI-powered insights",
+    "ordersAnalyzed": "Orders Analyzed",
+    "priceSavings":   "Avg Price Savings",
+    "accuracy":       "Forecast Accuracy",
+    "aiService":      "AI Service",
+    "optimize":       "Optimize Price",
+    "forecast":       "Generate Forecast",
+    "optimizing":     "Analyzing...",
+    "forecasting":    "Forecasting..."
+  },
+  "common": {
+    "loading":    "Loading...",
+    "error":      "Something went wrong",
+    "retry":      "Try Again",
+    "save":       "Save",
+    "cancel":     "Cancel",
+    "delete":     "Delete",
+    "edit":       "Edit",
+    "add":        "Add",
+    "search":     "Search",
+    "filter":     "Filter",
+    "export":     "Export",
+    "import":     "Import",
+    "yes":        "Yes",
+    "no":         "No",
+    "confirm":    "Confirm",
+    "back":       "Back",
+    "next":       "Next",
+    "submit":     "Submit",
+    "close":      "Close",
+    "online":     "Online",
+    "offline":    "Offline"
+  },
+  "auth": {
+    "login":          "Login",
+    "register":       "Register",
+    "email":          "Email",
+    "password":       "Password",
+    "firstName":      "First Name",
+    "lastName":       "Last Name",
+    "loginBtn":       "🔑 Login",
+    "registerBtn":    "✨ Create Account",
+    "loading":        "⏳ Please wait...",
+    "demoCredentials": "Demo: admin@demo.com / Admin@1234"
+  }
+}
