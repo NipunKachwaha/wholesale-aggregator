@@ -3,6 +3,7 @@ import { gsap } from "gsap";
 import OrderTable from "../components/orders/OrderTable";
 import OrderStatusBadge from "../components/orders/OrderStatusBadge";
 import ConsolidationPanel from "../components/orders/ConsolidationPanel";
+import ExportButton from '../components/ExportButton'
 import {
   getOrders,
   updateOrderStatus,
@@ -84,6 +85,7 @@ export default function Orders() {
           >
             🔄 Refresh
           </button>
+          <ExportButton reportType="orders" label="Export PDF" status={status !== 'All' ? status : undefined} />
         </div>
 
         {/* Status Summary */}

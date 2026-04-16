@@ -256,4 +256,88 @@ router.post("/vendors", async (req: Request, res: Response) => {
   }
 });
 
+// ── GET /catalog/search — Advanced ES search
+router.get('/search', async (req: Request, res: Response) => {
+  try {
+    const {
+      tenantId = '00000000-0000-0000-0000-000000000001',
+      q, category, minPrice, maxPrice, minStock,
+      sortBy, page, limit,
+    } = req.query as any
+
+    const { searchProducts } = await import('../sync/searchService')
+
+    const results = await searchProducts({
+      tenantId,
+      query:    q          || undefined,
+      category: category   || undefined,
+      minPrice: minPrice   ? Number(minPrice)  : undefined,
+      maxPrice: maxPrice   ? Number(maxPrice)  : undefined,
+      minStock: minStock   ? Number(minStock)  : undefined,
+      sortBy:   sortBy     || undefined,
+      page:     page       ? Number(page)      : 1,
+      limit:    limit      ? Number(limit)     : 20,
+    })
+
+    res.json({ success: true, data: results })
+  } catch (error: any) {
+    res.status(500).json({ success: false, error: error.message })
+  }
+})
+
+// ── POST /catalog/reindex
+router.post('/reindex', async (req: Request, res: Response) => {
+  try {
+    const tenantId = req.body.tenantId
+                  || '00000000-0000-0000-0000-000000000001'
+    const { reindexAllProducts } = await import('../sync/searchService')
+    const count = await reindexAllProducts(tenantId)
+
+    res.json({
+      success: true,
+      message: `${count} products re-indexed successfully`,
+      count,
+    })
+  } catch (error: any) {
+    res.status(500).json({ success: false, error: error.message })
+  }
+})
+
+// ── GET /catalog/reports/products
+router.get('/reports/products', async (req: Request, res: Response) => {
+  try {
+    const tenantId = req.query.tenantId as string
+                  || '00000000-0000-0000-0000-000000000001'
+
+    const { generateProductsReport } = await import('../sync/pdfReport.service')
+    const pdfBuffer = await generateProductsReport(tenantId)
+
+    res.setHeader('Content-Type',        'application/pdf')
+    res.setHeader('Content-Disposition', 'attachment; filename="products-report.pdf"')
+    res.send(pdfBuffer)
+
+  } catch (error: any) {
+    res.status(500).json({ success: false, error: error.message })
+  }
+})
+
+// ── GET /catalog/reports/orders
+router.get('/reports/orders', async (req: Request, res: Response) => {
+  try {
+    const tenantId = req.query.tenantId as string
+                  || '00000000-0000-0000-0000-000000000001'
+    const status   = req.query.status   as string | undefined
+
+    const { generateOrdersReport } = await import('../sync/pdfReport.service')
+    const pdfBuffer = await generateOrdersReport(tenantId, status)
+
+    res.setHeader('Content-Type',        'application/pdf')
+    res.setHeader('Content-Disposition', `attachment; filename="orders-report.pdf"`)
+    res.send(pdfBuffer)
+
+  } catch (error: any) {
+    res.status(500).json({ success: false, error: error.message })
+  }
+})
+
 export default router;

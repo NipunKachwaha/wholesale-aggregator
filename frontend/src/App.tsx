@@ -1,56 +1,70 @@
-import { useEffect } from 'react'
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { Provider, useSelector, useDispatch } from "react-redux";
-import { store } from "./store";
-import type { RootState } from "./store";
-import Layout from "./components/layout/Layout";
-import Login from "./pages/Login";
-import Dashboard from "./pages/Dashboard";
-import Products from "./pages/Products";
-import Orders from "./pages/Orders";
-import Vendors from "./pages/Vendors";
-import Analytics from './pages/Analytics'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { Provider, useSelector }                  from 'react-redux'
+import { store }                                  from './store'
+import type { RootState }                         from './store'
+import { lazy, Suspense, useEffect }              from 'react'
+import { useSelector as useReduxSelector }        from 'react-redux'
 
-// Protected Route
-function ProtectedRoute({ children }: { children: React.ReactNode }) {
-  const { isLoggedIn } = useSelector((state: RootState) => state.auth);
-  return isLoggedIn ? <>{children}</> : <Navigate to="/login" replace />;
+// ── Lazy load all pages
+const Layout    = lazy(() => import('./components/layout/Layout'))
+const Login     = lazy(() => import('./pages/Login'))
+const Dashboard = lazy(() => import('./pages/Dashboard'))
+const Products  = lazy(() => import('./pages/Products'))
+const Orders    = lazy(() => import('./pages/Orders'))
+const Vendors   = lazy(() => import('./pages/Vendors'))
+const Analytics = lazy(() => import('./pages/Analytics'))
+
+// ── Loading Spinner
+function PageLoader() {
+  return (
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-900 flex items-center justify-center">
+      <div className="text-center">
+        <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+        <p className="text-slate-500 dark:text-slate-400 text-sm">Loading...</p>
+      </div>
+    </div>
+  )
 }
 
+// ── Dark Mode Provider
 function DarkModeProvider({ children }: { children: React.ReactNode }) {
-  const { darkMode } = useSelector((state: RootState) => state.ui)
+  const { darkMode } = useReduxSelector((s: RootState) => s.ui)
 
   useEffect(() => {
-    if (darkMode) {
-      document.documentElement.classList.add('dark')
-    } else {
-      document.documentElement.classList.remove('dark')
-    }
+    document.documentElement.classList.toggle('dark', darkMode)
   }, [darkMode])
 
   return <>{children}</>
 }
 
+// ── Protected Route
+function ProtectedRoute({ children }: { children: React.ReactNode }) {
+  const { isLoggedIn } = useSelector((s: RootState) => s.auth)
+  return isLoggedIn ? <>{children}</> : <Navigate to="/login" replace />
+}
+
 function AppRoutes() {
   return (
-    <Routes>
-      <Route path="/login" element={<Login />} />
-      <Route
-        path="/"
-        element={
-          <ProtectedRoute>
-            <Layout />
-          </ProtectedRoute>
-        }
-      >
-        <Route index element={<Dashboard />} />
-        <Route path="products" element={<Products />} />
-        <Route path="orders" element={<Orders />} />
-        <Route path="vendors" element={<Vendors />} />
-        <Route path="analytics" element={<Analytics />} />
-      </Route>
-    </Routes>
-  );
+    <Suspense fallback={<PageLoader />}>
+      <Routes>
+        <Route path="/login" element={<Login />} />
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute>
+              <Layout />
+            </ProtectedRoute>
+          }
+        >
+          <Route index           element={<Dashboard />} />
+          <Route path="products" element={<Products />}  />
+          <Route path="orders"   element={<Orders />}    />
+          <Route path="vendors"  element={<Vendors />}   />
+          <Route path="analytics" element={<Analytics />} />
+        </Route>
+      </Routes>
+    </Suspense>
+  )
 }
 
 export default function App() {

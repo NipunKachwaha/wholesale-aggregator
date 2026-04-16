@@ -2,6 +2,8 @@ import { useState, useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import ProductTable from "../components/products/ProductTable";
 import { getProducts } from "../services/products.service";
+import AdvancedSearch from '../components/products/AdvancedSearch'
+import ExportButton from '../components/ExportButton'
 
 const CATEGORIES = [
   "All",
@@ -80,6 +82,12 @@ export default function Products() {
           >
             🔄 Refresh
           </button>
+          <ExportButton reportType="products" label="Export PDF" />
+        </div>
+
+        {/* Advanced ES Search */}
+        <div className="mb-6">
+          <AdvancedSearch />
         </div>
 
         {/* Search */}
