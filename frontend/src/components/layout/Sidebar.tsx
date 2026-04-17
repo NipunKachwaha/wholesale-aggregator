@@ -14,6 +14,11 @@ const navItems = [
   { path: '/analytics', icon: '📈', key: 'analytics'  },
 ]
 
+// Sirf admin ke liye alag items
+const adminItems = [
+  { path: '/admin', icon: '🛡️', key: 'admin' },
+]
+
 export default function Sidebar() {
   const dispatch        = useDispatch()
   const navigate        = useNavigate()
@@ -22,9 +27,11 @@ export default function Sidebar() {
   const { user }        = useSelector((s: RootState) => s.auth)
   const { sidebarOpen } = useSelector((s: RootState) => s.ui)
 
-  const sidebarRef = useRef<HTMLElement>(null)
-  const overlayRef = useRef<HTMLDivElement>(null)
-  const navRefs    = useRef<(HTMLAnchorElement | null)[]>([])
+  const sidebarRef  = useRef<HTMLElement>(null)
+  const overlayRef  = useRef<HTMLDivElement>(null)
+  const navRefs     = useRef<(HTMLAnchorElement | null)[]>([])
+  // Admin nav items ke liye alag refs
+  const adminNavRef = useRef<HTMLAnchorElement | null>(null)
 
   // Mobile detection
   const isMobile = window.innerWidth < 768
@@ -40,6 +47,15 @@ export default function Sidebar() {
       { x: 0, opacity: 1, duration: 0.3, stagger: 0.07, ease: 'power2.out' },
       '-=0.2'
     )
+
+    // Admin link bhi animate karo agar user admin hai
+    if (adminNavRef.current) {
+      tl.fromTo(adminNavRef.current,
+        { x: -20, opacity: 0 },
+        { x: 0, opacity: 1, duration: 0.3, ease: 'power2.out' },
+        '-=0.1'
+      )
+    }
   }, [])
 
   // Mobile mein overlay show
@@ -103,6 +119,8 @@ export default function Sidebar() {
 
         {/* Nav */}
         <nav className="flex-1 py-4 overflow-y-auto">
+
+          {/* ── Regular Nav Items ── */}
           {navItems.map((item, i) => (
             <NavLink
               key={item.path}
@@ -133,6 +151,43 @@ export default function Sidebar() {
               )}
             </NavLink>
           ))}
+
+          {/* ── Admin Link — sirf admin role wale users ko dikhega ── */}
+          {user?.role === 'admin' && (
+            <div className="border-t border-slate-700 mt-2 pt-2">
+              {adminItems.map((item) => (
+                <NavLink
+                  key={item.path}
+                  to={item.path}
+                  ref={(el) => { adminNavRef.current = el }}
+                  onClick={handleNavClick}
+                  onMouseEnter={(e) => {
+                    gsap.to(e.currentTarget, { x: 4, duration: 0.2 })
+                  }}
+                  onMouseLeave={(e) => {
+                    gsap.to(e.currentTarget, { x: 0, duration: 0.2 })
+                  }}
+                  className={({ isActive }) => `
+                    flex items-center gap-3 px-4 py-3 mx-2 rounded-lg
+                    transition-colors duration-150 mb-1 min-w-max
+                    ${isActive
+                      ? 'bg-red-600 text-white'
+                      : 'text-red-300 hover:bg-red-900/30 hover:text-red-200'
+                    }
+                  `}
+                >
+                  <span className="text-xl flex-shrink-0">{item.icon}</span>
+                  {sidebarOpen && (
+                    <span className="whitespace-nowrap font-medium">
+                      {/* Translation key nahi hai toh fallback text */}
+                      {t(`nav.${item.key}`, 'Admin Panel')}
+                    </span>
+                  )}
+                </NavLink>
+              ))}
+            </div>
+          )}
+
         </nav>
 
         {/* User + Logout */}

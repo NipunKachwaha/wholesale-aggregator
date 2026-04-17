@@ -13,6 +13,7 @@ const Products  = lazy(() => import('./pages/Products'))
 const Orders    = lazy(() => import('./pages/Orders'))
 const Vendors   = lazy(() => import('./pages/Vendors'))
 const Analytics = lazy(() => import('./pages/Analytics'))
+const AdminPanel = lazy(() => import('./pages/admin/AdminPanel'))
 
 // ── Loading Spinner
 function PageLoader() {
@@ -61,6 +62,7 @@ function AppRoutes() {
           <Route path="orders"   element={<Orders />}    />
           <Route path="vendors"  element={<Vendors />}   />
           <Route path="analytics" element={<Analytics />} />
+          <Route path="admin" element={<AdminPanel />} />
         </Route>
       </Routes>
     </Suspense>
