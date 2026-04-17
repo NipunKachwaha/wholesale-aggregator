@@ -40,6 +40,12 @@ cd services/catalog-service && npm run dev
 # Order Service
 cd services/order-service && npm run dev
 
+# Graphql Service
+cd services/graphql-service && npm run dev
+
+# Collab Service
+cd services/collab-service && npm run dev
+
 # AI Service
 cd ai-service
 venv\Scripts\Activate.ps1  # Windows
