@@ -53,6 +53,9 @@ python -m uvicorn main:app --port 8000
 
 # Frontend
 cd frontend && npm run dev
+
+# Mobile
+cd mobile && npx expo start
 ```
 
 4. **Open Browser**

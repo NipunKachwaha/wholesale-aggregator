@@ -4,6 +4,7 @@ import OrderTable from "../components/orders/OrderTable";
 import OrderStatusBadge from "../components/orders/OrderStatusBadge";
 import ConsolidationPanel from "../components/orders/ConsolidationPanel";
 import ExportButton from '../components/ExportButton'
+import PaymentModal from '../components/PaymentModal'
 import {
   getOrders,
   updateOrderStatus,
@@ -24,6 +25,7 @@ export default function Orders() {
   const [loading, setLoading] = useState(true);
   const [status, setStatus] = useState("All");
   const [error, setError] = useState<string | null>(null);
+  const [paymentOrder, setPaymentOrder] = useState<any>(null);
 
   const headerRef = useRef<HTMLDivElement>(null);
 
@@ -79,13 +81,15 @@ export default function Orders() {
               {orders.length} total orders
             </p>
           </div>
-          <button
-            onClick={() => fetchOrders(status)}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700"
-          >
-            🔄 Refresh
-          </button>
-          <ExportButton reportType="orders" label="Export PDF" status={status !== 'All' ? status : undefined} />
+          <div className="flex gap-2">
+            <button
+              onClick={() => fetchOrders(status)}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700"
+            >
+              🔄 Refresh
+            </button>
+            <ExportButton reportType="orders" label="Export PDF" status={status !== 'All' ? status : undefined} />
+          </div>
         </div>
 
         {/* Status Summary */}
@@ -134,13 +138,27 @@ export default function Orders() {
           orders={orders}
           loading={loading}
           onUpdate={() => fetchOrders(status)}
+          onPay={(order) => setPaymentOrder(order)} /* <-- Added onPay prop here */
         />
       </div>
-
+      
       {/* Consolidation Panel */}
       <div className="mt-6">
         <ConsolidationPanel />
       </div>
+
+      {/* Payment Modal */}
+      {paymentOrder && (
+        <PaymentModal
+          orderId={paymentOrder.id}
+          amount={Number(paymentOrder.total_amount)}
+          onClose={() => setPaymentOrder(null)}
+          onSuccess={() => {
+            setPaymentOrder(null);
+            fetchOrders(status);
+          }}
+        />
+      )}
     </div>
   );
 }

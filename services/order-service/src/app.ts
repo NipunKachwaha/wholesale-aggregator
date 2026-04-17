@@ -3,6 +3,7 @@ import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
 import orderRouter from "./routes/order.routes";
+import paymentRouter from './routes/payment.routes'
 
 const app: Application = express();
 
@@ -15,6 +16,7 @@ app.use(
 );
 app.use(express.json());
 app.use(morgan("dev"));
+app.use('/payments', paymentRouter)
 
 // ── Routes
 app.use("/orders", orderRouter);
